@@ -11,7 +11,9 @@ public class hello_world
 
     private readonly String _response = @"
     {
-        ""message"": ""Hello, Azure Functions!""
+        ""message"": ""Hello, TSG Azure Functions!"",
+        ""version"": ""1.0.0"",
+        ""copyright"": ""(c) 2025 - The Software Gorilla, a division of Intangere, LLC""
     }";
 
     public hello_world(ILogger<hello_world> logger)
