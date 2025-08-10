@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "FuncTest": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7007",
+      "launchBrowser": false
+    }
+  }
+}
