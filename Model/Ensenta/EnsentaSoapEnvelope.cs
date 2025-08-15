@@ -1,10 +1,10 @@
 using System.Xml.Serialization;
 
-namespace FuncTest.Messages;
+namespace FuncTest.Model.Ensenta;
 
 [XmlRoot(ElementName = "Envelope", Namespace = "http://schemas.xmlsoap.org/soap/envelope/")]
-public class SoapEnvelope
+public class EnsentaSoapEnvelope
 {
     [XmlElement(ElementName = "Body", Namespace = "http://schemas.xmlsoap.org/soap/envelope/")]
-    public SoapBody Body { get; set; }
+    public EnsentaSoapBody Body { get; set; }
 }

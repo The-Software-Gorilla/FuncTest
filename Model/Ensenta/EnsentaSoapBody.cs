@@ -1,8 +1,8 @@
 using System.Xml.Serialization;
 
-namespace FuncTest.Messages;
+namespace FuncTest.Model.Ensenta;
 
-public class SoapBody
+public class EnsentaSoapBody
 {
     [XmlElement(ElementName = "DoDepositTransaction", Namespace = "http://ensenta.com/ECWebDepositHostRequest")]
     public DoDepositTransaction DoDepositTransaction { get; set; }

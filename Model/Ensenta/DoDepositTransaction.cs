@@ -1,7 +1,7 @@
-using System.Xml.Serialization;
 using System.Text.Json.Serialization;
+using System.Xml.Serialization;
 
-namespace FuncTest.Messages;
+namespace FuncTest.Model.Ensenta;
 
 public class DoDepositTransaction
 {

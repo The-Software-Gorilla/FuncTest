@@ -1,7 +1,7 @@
 using System.Text;
 using System.Text.Json;
 using System.Xml.Serialization;
-using FuncTest.Messages;
+using FuncTest.Model.Ensenta;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
@@ -35,11 +35,11 @@ public class DepositTransactionTester
         _logger.LogInformation(xml);
         
         // Deserialize XML to SoapEnvelope
-        var serializer = new XmlSerializer(typeof(SoapEnvelope));
-        SoapEnvelope envelope;
+        var serializer = new XmlSerializer(typeof(EnsentaSoapEnvelope));
+        EnsentaSoapEnvelope envelope;
         using (var stringReader = new StringReader(xml))
         {
-            envelope = (SoapEnvelope)serializer.Deserialize(stringReader);
+            envelope = (EnsentaSoapEnvelope)serializer.Deserialize(stringReader);
         }
         
         // Get the DoDepositTransaction object

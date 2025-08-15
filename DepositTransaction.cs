@@ -43,6 +43,9 @@ public class DepositTransaction
         var entity = new TableEntity(partitionKey: "deposit", rowKey: transactionId.ToString())
         {
             { "ReceivedUtc", DateTime.UtcNow },
+            { "Status", "received" },
+            { "LastUpdatedUtc", DateTime.UtcNow },
+            { "Attempts", 0 },
             { "Xml", xml }   // If payloads can be huge, store in Blob instead and save a pointer here
         };
         await tableClient.AddEntityAsync(entity);
