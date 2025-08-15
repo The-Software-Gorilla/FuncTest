@@ -1,0 +1,41 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:pow="http://www.symxchange.generated.symitar.com/poweron" xmlns:tns="http://www.symxchange.generated.symitar.com/common/dto/common">
+    <soapenv:Header/>
+    <soapenv:Body>
+        <pow:executePowerOnReturnArray>
+            <Request BranchId="0">
+                <Credentials tns:ProcessorUser="821">
+                    <AdministrativeCredentials>
+                        <Password>PASSWORD</Password>
+                    </AdministrativeCredentials>
+                </Credentials>
+                <DeviceInformation DeviceType="DEVICETYPE" DeviceNumber="20652"/>
+                <Header>
+                    <MessageID>7129173225</MessageID>
+                </Header>
+                <Body>
+                    <File>KCU.SYC.MobileDeposit</File>
+                    <RGSession>1</RGSession>
+                    <UserDefinedParameters>
+                        <RGUserChr>
+                            <ID>1</ID>
+                            <Value>0000123456</Value>
+                        </RGUserChr>
+                        <RGUserChr>
+                            <ID>2</ID>
+                            <Value>0001</Value>
+                        </RGUserChr>
+                        <RGUserChr>
+                            <ID>3</ID>
+                            <Value>7123456790</Value>
+                        </RGUserChr>
+                        <RGUserNum>
+                            <ID>1</ID>
+                            <Value>76700</Value>
+                        </RGUserNum>
+                    </UserDefinedParameters>
+                    <User>821</User>
+                </Body>
+            </Request>
+        </pow:executePowerOnReturnArray>
+    </soapenv:Body>
+</soapenv:Envelope>

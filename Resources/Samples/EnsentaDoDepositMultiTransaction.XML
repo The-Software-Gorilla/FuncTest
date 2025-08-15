@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <soap:Body>
+        <DoDepositTransaction xmlns="http://ensenta.com/ECWebDepositHostRequest">
+            <accountHolderNumber>123456</accountHolderNumber>
+            <acctSuffix>S0001</acctSuffix>
+            <receiptTransactionNumber>7123456790</receiptTransactionNumber>
+            <stationDateTime>2025-08-01T00:00:00.0000-07:00</stationDateTime>
+            <isReversalFlag>N</isReversalFlag>
+            <transactionType>Deposit</transactionType>
+            <feeAmount>0</feeAmount>
+            <depositItems>
+                <DepositItem>
+                    <Amount>100.00</Amount>
+                    <CodeLine>V000000V T125108272T000000000V</CodeLine>
+                    <HostHoldCode>L</HostHoldCode>
+                    <FrontFileContents />
+                    <BackFileContents />
+                </DepositItem>
+                <DepositItem>
+                    <Amount>125.00</Amount>
+                    <CodeLine>V000000V T125108272T000000000V</CodeLine>
+                    <HostHoldCode>L</HostHoldCode>
+                    <FrontFileContents />
+                    <BackFileContents />
+                </DepositItem>
+                <DepositItem>
+                    <Amount>147.00</Amount>
+                    <CodeLine>V000000V T125108272T000000000V</CodeLine>
+                    <HostHoldCode>L</HostHoldCode>
+                    <FrontFileContents />
+                    <BackFileContents />
+                </DepositItem>
+                <DepositItem>
+                    <Amount>185.00</Amount>
+                    <CodeLine>V000000V T125108272T000000000V</CodeLine>
+                    <HostHoldCode>L</HostHoldCode>
+                    <FrontFileContents />
+                    <BackFileContents />
+                </DepositItem>
+                <DepositItem>
+                    <Amount>210.00</Amount>
+                    <CodeLine>V000000V T125108272T000000000V</CodeLine>
+                    <HostHoldCode>L</HostHoldCode>
+                    <FrontFileContents />
+                    <BackFileContents />
+                </DepositItem>
+            </depositItems>
+        </DoDepositTransaction>
+    </soap:Body>
+</soap:Envelope>
