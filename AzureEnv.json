@@ -10,7 +10,7 @@
 },
 {
 "name": "SymxInstanceUrl",
-"value": "https://tsg-dev-apim.azure-api.net/tsg-dev-functest/SymXMockEndpoint",
+"value": "https://tsg-dev-apim.azure-api.net/api/SymXMockEndpoint",
 "slotSetting": false
 },
 {
