@@ -1,8 +1,8 @@
 using System.Text.Json.Serialization;
 
-namespace FuncTest.Model.RDCSystem;
+namespace FuncTest.Model.RdcSystem;
 
-public class RDCForwarder
+public class RdcCallParams
 {
     [JsonPropertyName("transactionId")]
     public string TransactionId { get; set; }

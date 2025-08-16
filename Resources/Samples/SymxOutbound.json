@@ -1,0 +1,57 @@
+{
+  "symXCallId": "35422c96-8458-4231-9df3-bbf9144b6764",
+  "correlationId": "9eb72028-eab2-430d-affd-814f0c51bf82",
+  "callbackQueue": "deposit-callback",
+  "symXInstanceUrl": "RDC",
+  "symXPowerOn": "KCU.SYC.MobileDeposit",
+  "symXEnvelope": {
+    "header": {},
+    "body": {
+      "executePowerOnReturnArray": {
+        "request": {
+          "branchId": 0,
+          "credentials": {
+            "processorUser": "821",
+            "administrativeCredentials": {
+              "password": "PASSWORD"
+            }
+          },
+          "deviceInformation": {
+            "deviceType": "DEVICETYPE",
+            "deviceNumber": 20652
+          },
+          "header": {
+            "messageID": "7123456790"
+          },
+          "body": {
+            "file": "KCU.SYC.MobileDeposit",
+            "rgSession": 1,
+            "userDefinedParameters": {
+              "rgUserChr": [
+                {
+                  "id": 1,
+                  "value": "V000000V T125108272T000000000V"
+                },
+                {
+                  "id": 2,
+                  "value": "L"
+                },
+                {
+                  "id": 3,
+                  "value": "7123456790"
+                }
+              ],
+              "rgUserNum": [
+                {
+                  "id": 1,
+                  "value": 76700
+                }
+              ]
+            },
+            "user": "821"
+          }
+        }
+      }
+    }
+  }
+}

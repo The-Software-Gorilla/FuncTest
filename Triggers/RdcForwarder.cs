@@ -5,7 +5,7 @@ using Azure.Data.Tables;
 using Azure.Storage.Queues;
 using Azure.Storage.Queues.Models;
 using FuncTest.Model.Ensenta;
-using FuncTest.Model.RDCSystem;
+using FuncTest.Model.RdcSystem;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
@@ -30,7 +30,6 @@ public class RdcForwarder
     public async Task Run([QueueTrigger("deposit-inbound", Connection = "AzureWebJobsStorage")] QueueMessage message)
     {
         string transactionId = message.MessageText;
-        _logger.LogInformation("Processing deposit transaction: {messageText}", transactionId);
 
         // 1) Fetch XML from Azure Table Storage
         var table = new TableClient(_storageConn, TableName);
@@ -43,7 +42,7 @@ public class RdcForwarder
         }
         catch (RequestFailedException ex) when (ex.Status == 404)
         {
-            _logger.LogError("No table entity found for PK={PK} RK={RK}", PartitionKey, transactionId);
+            _logger.LogError(ex, "No table entity found for PK={PK} RK={RK}", PartitionKey, transactionId);
             return;
         }
 
@@ -66,7 +65,7 @@ public class RdcForwarder
 
         _logger.LogInformation("Deposit transaction ID {TransactionId} corresponds to {TransactionNumber}",
             transactionId, depositTransaction.receiptTransactionNumber);
-        Model.RDCSystem.RDCForwarder rg = new Model.RDCSystem.RDCForwarder
+        Model.RdcSystem.RdcCallParams rg = new Model.RdcSystem.RdcCallParams
         {
             TransactionId = transactionId,
             ReceiptTransactionNumber = depositTransaction.receiptTransactionNumber,
@@ -84,10 +83,10 @@ public class RdcForwarder
             if (rg.CodeLine == null) rg.CodeLine = di.CodeLine;
         }
         string rgUserNum1 = (rg.Amount * 100).ToString("F0");
-        _logger.LogInformation(" - Total deposit amount: {Total:C2}, RGUserNum1={rgUserNum1}, Item Count = {ItemCount}", rg.Amount, rgUserNum1, depositTransaction.depositItems.Count);
+        _logger.LogInformation(" - Total deposit amount: {Total:C2}, RGUserNum1={RgUserNum1}, Item Count = {ItemCount}", 
+            rg.Amount, rgUserNum1, depositTransaction.depositItems.Count);
         
         var json = JsonSerializer.Serialize(rg, new JsonSerializerOptions { WriteIndented = true });
-        _logger.LogInformation("RDCForwarder JSON:\n{Json}", json);
         
         // --- Send to Queue: deposit-inbound ---
         var queueClient = new QueueClient(_storageConn, "deposit-forward", new QueueClientOptions

@@ -1,4 +1,6 @@
 using System.Text.Json;
+using Azure;
+using Azure.Data.Tables;
 using Azure.Storage.Queues;
 using Azure.Storage.Queues.Models;
 using FuncTest.Model.SymX;
@@ -11,13 +13,18 @@ public class RdcSymxCallBuilder
 {
     private readonly ILogger<RdcSymxCallBuilder> _logger;
     private readonly string _storageConn;
-    private const string SymxPowerOn = "KCU.SYC.MobileDeposit";
-    private const string SymxInstanceUrl = "RDC";
-    private const string SymxUser = "821";
-    private const string SymxDeviceType = "DEVICETYPE";
-    private const int SymxDeviceNumber = 20652;
+    private readonly string _symxPowerOn;
+    private readonly string _symxInstanceUrl;
+    private readonly string _symxUser;
+    private readonly string _symxDeviceType;
+    private readonly int _symxDeviceNumber;
     private const string RdcCallbackQueue = "deposit-callback";
     private const string SymxOutboundQueue = "symx-outbound";
+    private const string SymxTableName = "symxOutbound";
+    private const string SymxPartitionKey = "symxCall";
+    private const string DepositTableName = "depositTransaction";
+    private const string DepositPartitionKey = "deposit";
+    
 
 
     public RdcSymxCallBuilder(ILogger<RdcSymxCallBuilder> logger)
@@ -25,6 +32,20 @@ public class RdcSymxCallBuilder
         _logger = logger;
         _storageConn = Environment.GetEnvironmentVariable("AzureWebJobsStorage")
                        ?? throw new InvalidOperationException("AzureWebJobsStorage is not set.");
+        _symxPowerOn = Environment.GetEnvironmentVariable("SymxPowerOn")
+                       ?? throw new InvalidOperationException("SymxPowerOn is not set.");
+        _symxInstanceUrl = Environment.GetEnvironmentVariable("SymxInstanceUrl")
+                       ?? throw new InvalidOperationException("SymxInstanceUrl is not set.");
+        _symxUser = Environment.GetEnvironmentVariable("SymxUser")
+                       ?? throw new InvalidOperationException("SymxUser is not set.");
+        _symxDeviceType = Environment.GetEnvironmentVariable("SymxDeviceType")
+                       ?? throw new InvalidOperationException("SymxDeviceType is not set.");
+        var deviceNumberStr = Environment.GetEnvironmentVariable("SymxDeviceNumber")
+                       ?? throw new InvalidOperationException("SymxDeviceNumber is not set.");
+        if (!int.TryParse(deviceNumberStr, out _symxDeviceNumber))
+        {
+            throw new InvalidOperationException("SymxDeviceNumber is not a valid integer.");
+        }
     }
 
     [Function(nameof(RdcSymxCallBuilder))]
@@ -32,34 +53,77 @@ public class RdcSymxCallBuilder
     {
         _logger.LogInformation(message.MessageText);
         
-        var rdcCallParams = JsonSerializer.Deserialize<Model.RDCSystem.RDCForwarder>(message.MessageText);
+        var rdcCallParams = JsonSerializer.Deserialize<Model.RdcSystem.RdcCallParams>(message.MessageText);
 
-        var rdcCall = CreateSymXCall(rdcCallParams);
+        var rdcSymxEnvelope = CreateRdcSymXEnvelope(rdcCallParams);
         
         var symXCall = new SymXCall
         {
             SymXCallId = Guid.NewGuid().ToString(),
             CorrelationId = rdcCallParams.TransactionId,
             CallbackQueue = RdcCallbackQueue,
-            SymXInstanceUrl = SymxInstanceUrl,
-            SymXPowerOn = SymxPowerOn,
-            SymXEnvelope = rdcCall
+            SymXInstanceUrl = _symxInstanceUrl,
+            SymXPowerOn = _symxPowerOn,
+            SymXEnvelope = rdcSymxEnvelope
         };
         
         var json = JsonSerializer.Serialize(symXCall, new JsonSerializerOptions { WriteIndented = true });
         
+        await StoreSymxCallInTable(symXCall, rdcCallParams, json);
+        
+        await QueueSymxCall(symXCall.SymXCallId);
+        
+        await UpdateDepositEntityStatus(rdcCallParams.TransactionId, "symx_queued");
+        
+        _logger.LogInformation("RDC SymX Call XML for Transaction ID: {TransactionId}, SymXCallId: {CallId}", rdcCallParams.TransactionId, symXCall.SymXCallId);
+        
+    }
+    
+    private async Task UpdateDepositEntityStatus(string transactionId, string status)
+    {
+        var depositTable = new TableClient(_storageConn, DepositTableName);
+        try
+        {
+            var resp = await depositTable.GetEntityAsync<TableEntity>(DepositPartitionKey, transactionId);
+            var depositEntity = resp.Value;
+            depositEntity["Status"] = status;
+            depositEntity["LastUpdatedUtc"] = DateTime.UtcNow;
+            await depositTable.UpdateEntityAsync(depositEntity, depositEntity.ETag, TableUpdateMode.Replace);
+        }
+        catch (RequestFailedException ex) when (ex.Status == 404)
+        {
+            _logger.LogError(ex, "No deposit transaction entity found for PK={PK} RK={RK}", DepositPartitionKey, transactionId);
+        }
+    }
+    
+    private async Task QueueSymxCall(string symXCallId)
+    {
         var queueClient = new QueueClient(_storageConn, SymxOutboundQueue, new QueueClientOptions
         {
             MessageEncoding = QueueMessageEncoding.Base64
         });
         await queueClient.CreateIfNotExistsAsync();
-        await queueClient.SendMessageAsync(json);
-        
-        _logger.LogInformation("RDC SymX Call XML for Transaction ID {TransactionId}:\n{Xml}", rdcCallParams.TransactionId, json);
+        await queueClient.SendMessageAsync(symXCallId);
         
     }
     
-    private static SymXSoapEnvelope CreateSymXCall(Model.RDCSystem.RDCForwarder rdcCallParams)
+    private async Task StoreSymxCallInTable(SymXCall symXCall, Model.RdcSystem.RdcCallParams rdcCallParams, string json)
+    {
+        var symxTable = new TableClient(_storageConn, SymxTableName);
+        await symxTable.CreateIfNotExistsAsync();
+        var symxEntity = new TableEntity(SymxPartitionKey, symXCall.SymXCallId)
+        {
+            { "CorrelationId", rdcCallParams.TransactionId },
+            { "ReceivedUtc", DateTime.UtcNow },
+            { "Status", "created" },
+            { "LastUpdatedUtc", DateTime.UtcNow },
+            { "Attempts", 0 },
+            { "Call", json } // If payloads can be huge, store in Blob instead and save a pointer here
+        };
+        await symxTable.AddEntityAsync(symxEntity);
+    }
+    
+    private SymXSoapEnvelope CreateRdcSymXEnvelope(Model.RdcSystem.RdcCallParams rdcCallParams)
     {
         return new SymXSoapEnvelope
         {
@@ -75,7 +139,7 @@ public class RdcSymxCallBuilder
                         BranchId = 0,
                         Credentials = new Credentials
                         {
-                            ProcessorUser = SymxUser,
+                            ProcessorUser = _symxUser,
                             AdministrativeCredentials = new AdministrativeCredentials()
                             {
                                 Password = "PASSWORD"
@@ -83,8 +147,8 @@ public class RdcSymxCallBuilder
                         },
                         DeviceInformation = new DeviceInformation
                         {
-                            DeviceType = SymxDeviceType,
-                            DeviceNumber = SymxDeviceNumber
+                            DeviceType = _symxDeviceType,
+                            DeviceNumber = _symxDeviceNumber
                         },
                         Header = new RequestHeader
                         {
@@ -92,38 +156,40 @@ public class RdcSymxCallBuilder
                         },
                         Body = new RequestBody
                         {
-                            File = SymxPowerOn,
+                            File = _symxPowerOn,
                             RGSession = 1,
                             UserDefinedParameters = new UserDefinedParameters
                             {
-                                RGUserChr = new List<RGUserChr>
-                                {
+                                RGUserChr =
+                                [
                                     new RGUserChr
                                     {
                                         ID = 1,
                                         Value = rdcCallParams.CodeLine
                                     },
+
                                     new RGUserChr
                                     {
                                         ID = 2,
                                         Value = rdcCallParams.HostHoldCode
                                     },
+
                                     new RGUserChr
                                     {
                                         ID = 3,
                                         Value = rdcCallParams.ReceiptTransactionNumber
                                     }
-                                },
-                                RGUserNum = new List<RGUserNum>
-                                {
+                                ],
+                                RGUserNum =
+                                [
                                     new RGUserNum
                                     {
                                         ID = 1,
                                         Value = (int)(rdcCallParams.Amount * 100) // Amount in cents
                                     }
-                                }
+                                ]
                             },
-                            User = SymxUser
+                            User = _symxUser
                         }
                     }
                 }
