@@ -1,0 +1,25 @@
+{
+  "name": "SymxDeviceNumber",
+  "value": "20652",
+  "slotSetting": false
+},
+{
+"name": "SymxDeviceType",
+"value": "DEVICETYPE",
+"slotSetting": false
+},
+{
+"name": "SymxInstanceUrl",
+"value": "https://tsg-dev-apim.azure-api.net/tsg-dev-functest/SymXMockEndpoint",
+"slotSetting": false
+},
+{
+"name": "SymxPowerOn",
+"value": "KCU.SYC.MobileDeposit",
+"slotSetting": false
+},
+{
+"name": "SymxUser",
+"value": "821",
+"slotSetting": false
+},
