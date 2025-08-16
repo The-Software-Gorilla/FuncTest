@@ -4,12 +4,12 @@ using Azure;
 using Azure.Data.Tables;
 using Azure.Storage.Queues;
 using Azure.Storage.Queues.Models;
-using FuncTest.Model.Ensenta;
-using FuncTest.Model.RdcSystem;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using Tsg.Rdc.Model.Ensenta;
+using Tsg.Rdc.Model.RDCSystem;
 
-namespace FuncTest.Triggers;
+namespace Tsg.Rdc.Triggers;
 
 public class RdcForwarder
 {
@@ -65,7 +65,7 @@ public class RdcForwarder
 
         _logger.LogInformation("Deposit transaction ID {TransactionId} corresponds to {TransactionNumber}",
             transactionId, depositTransaction.receiptTransactionNumber);
-        Model.RdcSystem.RdcCallParams rg = new Model.RdcSystem.RdcCallParams
+        RdcCallParams rg = new RdcCallParams
         {
             TransactionId = transactionId,
             ReceiptTransactionNumber = depositTransaction.receiptTransactionNumber,

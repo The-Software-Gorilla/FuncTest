@@ -1,13 +1,13 @@
 using System.Text;
 using System.Text.Json;
 using System.Xml.Serialization;
-using FuncTest.Model.SymX;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using Tsg.Rdc.Model.SymX;
 
-namespace FuncTest.Triggers.Tests;
+namespace Tsg.Rdc.Triggers.Tests;
 
 public class SymXPowerOnSerializationTester
 {

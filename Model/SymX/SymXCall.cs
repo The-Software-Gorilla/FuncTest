@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace FuncTest.Model.SymX;
+namespace Tsg.Rdc.Model.SymX;
 
 public class SymXCall
 {

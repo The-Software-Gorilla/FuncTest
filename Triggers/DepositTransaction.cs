@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
-namespace FuncTest.Triggers;
+namespace Tsg.Rdc.Triggers;
 
 public class DepositTransaction
 {

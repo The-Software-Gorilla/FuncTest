@@ -1,4 +1,4 @@
-namespace FuncTest.Model.SymX;
+namespace Tsg.Rdc.Model.SymX;
 
 public class SymXSoapHeader
 {

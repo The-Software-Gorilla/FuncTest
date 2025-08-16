@@ -1,6 +1,6 @@
 using System.Xml.Serialization;
 
-namespace FuncTest.Model.Ensenta;
+namespace Tsg.Rdc.Model.Ensenta;
 
 public class EnsentaSoapBody
 {

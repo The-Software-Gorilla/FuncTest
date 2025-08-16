@@ -1,8 +1,7 @@
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
-using Azure.Core;
 
-namespace FuncTest.Model.SymX;
+namespace Tsg.Rdc.Model.SymX;
 
 public class ExecutePowerOnReturnArray
 {

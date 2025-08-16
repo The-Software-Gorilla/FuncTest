@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "FuncTest": {
+    "Tsg.Rdc": {
       "commandName": "Project",
       "commandLineArgs": "--port 7007",
       "launchBrowser": false

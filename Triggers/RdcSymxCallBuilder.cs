@@ -3,11 +3,12 @@ using Azure;
 using Azure.Data.Tables;
 using Azure.Storage.Queues;
 using Azure.Storage.Queues.Models;
-using FuncTest.Model.SymX;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using Tsg.Rdc.Model.RDCSystem;
+using Tsg.Rdc.Model.SymX;
 
-namespace FuncTest.Triggers;
+namespace Tsg.Rdc.Triggers;
 
 public class RdcSymxCallBuilder
 {
@@ -53,7 +54,7 @@ public class RdcSymxCallBuilder
     {
         _logger.LogInformation(message.MessageText);
         
-        var rdcCallParams = JsonSerializer.Deserialize<Model.RdcSystem.RdcCallParams>(message.MessageText);
+        var rdcCallParams = JsonSerializer.Deserialize<RdcCallParams>(message.MessageText);
 
         var rdcSymxEnvelope = CreateRdcSymXEnvelope(rdcCallParams);
         
@@ -107,7 +108,7 @@ public class RdcSymxCallBuilder
         
     }
     
-    private async Task StoreSymxCallInTable(SymXCall symXCall, Model.RdcSystem.RdcCallParams rdcCallParams, string json)
+    private async Task StoreSymxCallInTable(SymXCall symXCall, RdcCallParams rdcCallParams, string json)
     {
         var symxTable = new TableClient(_storageConn, SymxTableName);
         await symxTable.CreateIfNotExistsAsync();
@@ -123,7 +124,7 @@ public class RdcSymxCallBuilder
         await symxTable.AddEntityAsync(symxEntity);
     }
     
-    private SymXSoapEnvelope CreateRdcSymXEnvelope(Model.RdcSystem.RdcCallParams rdcCallParams)
+    private SymXSoapEnvelope CreateRdcSymXEnvelope(RdcCallParams rdcCallParams)
     {
         return new SymXSoapEnvelope
         {

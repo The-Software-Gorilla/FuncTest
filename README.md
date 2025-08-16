@@ -1,6 +1,6 @@
-# Welcome to FuncTest
+# Welcome to Tsg.Rdc
 
-FuncTest is a prototype application to test a solution for a remote deposit capture system. 
+Tsg.Rdc is a prototype application to test a solution for a remote deposit capture system. 
 
 The solution is built using **.NET 8** and **Azure Functions**.
 
@@ -20,17 +20,17 @@ file with the necessary configuration settings. If you followed the setup instru
 copy the provided `local.settings.example.json` file.
 
 ## Project Structure
-- `FuncTest/`: The main Azure Functions project.
-- `FuncTest/Triggers/`: The Azure Function triggers. These correspond to triggers in the architecture diagram.
-- `FuncTest/Triggers/Tests/`: HTTP Post triggers that allow testing of the serialization and deserialization of the models. 
+- `Tsg.Rdc/`: The main Azure Functions project.
+- `Tsg.Rdc/Triggers/`: The Azure Function triggers. These correspond to triggers in the architecture diagram.
+- `Tsg.Rdc/Triggers/Tests/`: HTTP Post triggers that allow testing of the serialization and deserialization of the models. 
 Nothing sent to these tests is processed at all. It simply returns the data back to the caller in the opposite format of
 what was received (JSON in, XML out; XML in, JSON out). These can be called from Postman.
-- `FuncTest/Model/`: The data models used in the application. All are serializable in Json. The SymX and Ensenta models 
+- `Tsg.Rdc/Model/`: The data models used in the application. All are serializable in Json. The SymX and Ensenta models 
 are serializable in XML as well. There are three folders inside this model:
     - the Ensenta XML document
     - the internal structures for the RDC system
     - the SymX XML document
-- `FuncTest/Resources/Samples`: Example XML files for the Ensenta and SymX documents.
+- `Tsg.Rdc/Resources/Samples`: Example XML files for the Ensenta and SymX documents.
 
 ## Triggers
 The application contains the following Azure Function triggers:

@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace FuncTest.Model.RdcSystem;
+namespace Tsg.Rdc.Model.RDCSystem;
 
 public class RdcCallParams
 {

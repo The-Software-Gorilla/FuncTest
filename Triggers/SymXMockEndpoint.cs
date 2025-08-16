@@ -1,13 +1,13 @@
 using System.Text;
 using System.Xml.Serialization;
 using Azure.Data.Tables;
-using FuncTest.Model.SymX;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using Tsg.Rdc.Model.SymX;
 
-namespace FuncTest.Triggers;
+namespace Tsg.Rdc.Triggers;
 
 public class SymXMockEndpoint
 {

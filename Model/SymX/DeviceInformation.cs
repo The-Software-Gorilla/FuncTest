@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
-namespace FuncTest.Model.SymX;
+namespace Tsg.Rdc.Model.SymX;
 
 public class DeviceInformation
 {
