@@ -1,4 +1,3 @@
-using System;
 using System.Text.Json;
 using System.Xml.Serialization;
 using Azure;
@@ -10,24 +9,24 @@ using FuncTest.Model.RDCSystem;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
-namespace FuncTest;
+namespace FuncTest.Triggers;
 
-public class ProcessDepositInbound
+public class RdcForwarder
 {
-    private readonly ILogger<ProcessDepositInbound> _logger;
+    private readonly ILogger<RdcForwarder> _logger;
     private readonly string _storageConn;
     private const string TableName = "depositTransaction";
     private const string PartitionKey = "deposit";
 
 
-    public ProcessDepositInbound(ILogger<ProcessDepositInbound> logger)
+    public RdcForwarder(ILogger<RdcForwarder> logger)
     {
         _logger = logger;
         _storageConn = Environment.GetEnvironmentVariable("AzureWebJobsStorage")
                        ?? throw new InvalidOperationException("AzureWebJobsStorage is not set.");
     }
 
-    [Function(nameof(ProcessDepositInbound))]
+    [Function(nameof(RdcForwarder))]
     public async Task Run([QueueTrigger("deposit-inbound", Connection = "AzureWebJobsStorage")] QueueMessage message)
     {
         string transactionId = message.MessageText;
@@ -67,7 +66,7 @@ public class ProcessDepositInbound
 
         _logger.LogInformation("Deposit transaction ID {TransactionId} corresponds to {TransactionNumber}",
             transactionId, depositTransaction.receiptTransactionNumber);
-        RDCForwarder rg = new RDCForwarder
+        Model.RDCSystem.RDCForwarder rg = new Model.RDCSystem.RDCForwarder
         {
             TransactionId = transactionId,
             ReceiptTransactionNumber = depositTransaction.receiptTransactionNumber,

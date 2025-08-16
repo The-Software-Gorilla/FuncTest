@@ -1,23 +1,23 @@
-using System;
-using System.Text;
 using System.Text.Json;
-using System.Xml;
-using System.Xml.Serialization;
 using Azure.Storage.Queues;
 using Azure.Storage.Queues.Models;
-using FuncTest.Model.RDCSystem;
 using FuncTest.Model.SymX;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
-namespace FuncTest;
+namespace FuncTest.Triggers;
 
 public class RdcSymxCallBuilder
 {
     private readonly ILogger<RdcSymxCallBuilder> _logger;
     private readonly string _storageConn;
-    // private const string TableName = "depositTransaction";
-    // private const string PartitionKey = "deposit";
+    private const string SymxPowerOn = "KCU.SYC.MobileDeposit";
+    private const string SymxInstanceUrl = "RDC";
+    private const string SymxUser = "821";
+    private const string SymxDeviceType = "DEVICETYPE";
+    private const int SymxDeviceNumber = 20652;
+    private const string RdcCallbackQueue = "deposit-callback";
+    private const string SymxOutboundQueue = "symx-outbound";
 
 
     public RdcSymxCallBuilder(ILogger<RdcSymxCallBuilder> logger)
@@ -32,21 +32,23 @@ public class RdcSymxCallBuilder
     {
         _logger.LogInformation(message.MessageText);
         
-        var rdcCallParams = JsonSerializer.Deserialize<RDCForwarder>(message.MessageText);
+        var rdcCallParams = JsonSerializer.Deserialize<Model.RDCSystem.RDCForwarder>(message.MessageText);
 
         var rdcCall = CreateSymXCall(rdcCallParams);
         
         var symXCall = new SymXCall
         {
+            SymXCallId = Guid.NewGuid().ToString(),
             CorrelationId = rdcCallParams.TransactionId,
-            CallbackQueue = "deposit-callback",
-            SymXInstance = "RDC",
+            CallbackQueue = RdcCallbackQueue,
+            SymXInstanceUrl = SymxInstanceUrl,
+            SymXPowerOn = SymxPowerOn,
             SymXEnvelope = rdcCall
         };
         
         var json = JsonSerializer.Serialize(symXCall, new JsonSerializerOptions { WriteIndented = true });
         
-        var queueClient = new QueueClient(_storageConn, "symx-outbound", new QueueClientOptions
+        var queueClient = new QueueClient(_storageConn, SymxOutboundQueue, new QueueClientOptions
         {
             MessageEncoding = QueueMessageEncoding.Base64
         });
@@ -57,7 +59,7 @@ public class RdcSymxCallBuilder
         
     }
     
-    private SymXSoapEnvelope CreateSymXCall(RDCForwarder rdcCallParams)
+    private static SymXSoapEnvelope CreateSymXCall(Model.RDCSystem.RDCForwarder rdcCallParams)
     {
         return new SymXSoapEnvelope
         {
@@ -73,7 +75,7 @@ public class RdcSymxCallBuilder
                         BranchId = 0,
                         Credentials = new Credentials
                         {
-                            ProcessorUser = "821",
+                            ProcessorUser = SymxUser,
                             AdministrativeCredentials = new AdministrativeCredentials()
                             {
                                 Password = "PASSWORD"
@@ -81,8 +83,8 @@ public class RdcSymxCallBuilder
                         },
                         DeviceInformation = new DeviceInformation
                         {
-                            DeviceType = "DEVICETYPE",
-                            DeviceNumber = 20652
+                            DeviceType = SymxDeviceType,
+                            DeviceNumber = SymxDeviceNumber
                         },
                         Header = new RequestHeader
                         {
@@ -90,11 +92,11 @@ public class RdcSymxCallBuilder
                         },
                         Body = new RequestBody
                         {
-                            File = "KCU.SYC.MobileDeposit",
+                            File = SymxPowerOn,
                             RGSession = 1,
                             UserDefinedParameters = new UserDefinedParameters
                             {
-                                RGUserChr = new List<RGUserChr>()
+                                RGUserChr = new List<RGUserChr>
                                 {
                                     new RGUserChr
                                     {
@@ -112,7 +114,7 @@ public class RdcSymxCallBuilder
                                         Value = rdcCallParams.ReceiptTransactionNumber
                                     }
                                 },
-                                RGUserNum = new List<RGUserNum>()
+                                RGUserNum = new List<RGUserNum>
                                 {
                                     new RGUserNum
                                     {
@@ -121,7 +123,7 @@ public class RdcSymxCallBuilder
                                     }
                                 }
                             },
-                            User = "821"
+                            User = SymxUser
                         }
                     }
                 }

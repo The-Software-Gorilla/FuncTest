@@ -4,9 +4,9 @@
 name: Build and deploy dotnet core app to Azure Function App - tsg-dev-functest
 
 on:
-  push:
-    branches:
-      - main
+#  push:
+#    branches:
+#      - main
   workflow_dispatch:
 
 env:

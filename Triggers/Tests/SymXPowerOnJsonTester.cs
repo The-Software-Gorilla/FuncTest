@@ -3,12 +3,12 @@ using System.Text.Json;
 using System.Xml;
 using System.Xml.Serialization;
 using FuncTest.Model.SymX;
-using Microsoft.Azure.Functions.Worker;
-using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.Logging;
 
-namespace FuncTest;
+namespace FuncTest.Triggers.Tests;
 
 public class SymXPowerOnJsonTester
 {
@@ -19,7 +19,7 @@ public class SymXPowerOnJsonTester
         _logger = logger;
     }
 
-    [Function("SymXJsonToXml")]
+    [Function("testSymXJsonToXml")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function,"post")] HttpRequest req)
     {
         _logger.LogInformation("C# HTTP trigger function processed a request.");
