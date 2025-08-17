@@ -25,6 +25,9 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
+          
+      - name: Verify credentials
+        run: echo "GITHUB_TOKEN is set: ${{ secrets.GITHUB_TOKEN }}"
 
       # Add your org's GitHub Packages NuGet feed and authenticate with GITHUB_TOKEN
       - name: Configure GitHub Packages NuGet source
