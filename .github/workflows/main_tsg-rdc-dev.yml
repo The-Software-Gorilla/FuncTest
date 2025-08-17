@@ -26,18 +26,13 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
           
-      - name: Verify credentials
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: echo "GITHUB_TOKEN length is ${#GITHUB_TOKEN}"
-
       # Add your org's GitHub Packages NuGet feed and authenticate with GITHUB_TOKEN
       - name: Configure GitHub Packages NuGet source
         run: |
           dotnet nuget add source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" \
             --name "github" \
             --username "${{ github.actor }}" \
-            --password "${{ secrets.GITHUB_TOKEN }}" \
+            --password "${{ secrets.GH_PACKAGES_TOKEN }}" \
             --store-password-in-clear-text
           dotnet nuget list source
 
