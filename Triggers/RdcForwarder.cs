@@ -6,7 +6,7 @@ using Azure.Storage.Queues;
 using Azure.Storage.Queues.Models;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using Tsg.Rdc.Model.Ensenta;
+using Tsg.Models.Ensenta;
 using Tsg.Rdc.Model.RDCSystem;
 
 namespace Tsg.Rdc.Triggers;
@@ -64,17 +64,17 @@ public class RdcForwarder
         var depositTransaction = envelope.Body.DoDepositTransaction;
 
         _logger.LogInformation("Deposit transaction ID {TransactionId} corresponds to {TransactionNumber}",
-            transactionId, depositTransaction.receiptTransactionNumber);
+            transactionId, depositTransaction.ReceiptTransactionNumber);
         RdcCallParams rg = new RdcCallParams
         {
             TransactionId = transactionId,
-            ReceiptTransactionNumber = depositTransaction.receiptTransactionNumber,
-            DepositItemCount = depositTransaction.depositItems.Count,
+            ReceiptTransactionNumber = depositTransaction.ReceiptTransactionNumber,
+            DepositItemCount = depositTransaction.DepositItems.Count,
             CodeLine = null,
             HostHoldCode = null,
             Amount = 0m
         };
-        foreach (var di in depositTransaction.depositItems)
+        foreach (var di in depositTransaction.DepositItems)
         {
             _logger.LogInformation(" - Item: HoldCode={Code}, CodeLine={CodeLine}, Amount={Amount}",
                 di.HostHoldCode, di.CodeLine, di.Amount);
@@ -84,7 +84,7 @@ public class RdcForwarder
         }
         string rgUserNum1 = (rg.Amount * 100).ToString("F0");
         _logger.LogInformation(" - Total deposit amount: {Total:C2}, RGUserNum1={RgUserNum1}, Item Count = {ItemCount}", 
-            rg.Amount, rgUserNum1, depositTransaction.depositItems.Count);
+            rg.Amount, rgUserNum1, depositTransaction.DepositItems.Count);
         
         var json = JsonSerializer.Serialize(rg, new JsonSerializerOptions { WriteIndented = true });
         

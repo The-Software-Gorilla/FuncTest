@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using Tsg.Rdc.Model.Ensenta;
+using Tsg.Models.Ensenta;
 
 namespace Tsg.Rdc.Triggers.Tests;
 
