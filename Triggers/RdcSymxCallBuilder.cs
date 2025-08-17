@@ -6,7 +6,7 @@ using Azure.Storage.Queues.Models;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Tsg.Rdc.Model.RDCSystem;
-using Tsg.Rdc.Model.SymX;
+using Tsg.Models.SymX;
 
 namespace Tsg.Rdc.Triggers;
 
@@ -153,39 +153,39 @@ public class RdcSymxCallBuilder
                         },
                         Header = new RequestHeader
                         {
-                            MessageID = rdcCallParams.ReceiptTransactionNumber
+                            MessageId = rdcCallParams.ReceiptTransactionNumber
                         },
                         Body = new RequestBody
                         {
                             File = _symxPowerOn,
-                            RGSession = 1,
+                            RgSession = 1,
                             UserDefinedParameters = new UserDefinedParameters
                             {
-                                RGUserChr =
+                                RgUserChr =
                                 [
-                                    new RGUserChr
+                                    new RgUserChr
                                     {
-                                        ID = 1,
+                                        Id = 1,
                                         Value = rdcCallParams.CodeLine
                                     },
 
-                                    new RGUserChr
+                                    new RgUserChr
                                     {
-                                        ID = 2,
+                                        Id = 2,
                                         Value = rdcCallParams.HostHoldCode
                                     },
 
-                                    new RGUserChr
+                                    new RgUserChr
                                     {
-                                        ID = 3,
+                                        Id = 3,
                                         Value = rdcCallParams.ReceiptTransactionNumber
                                     }
                                 ],
-                                RGUserNum =
+                                RgUserNum =
                                 [
-                                    new RGUserNum
+                                    new RgUserNum
                                     {
-                                        ID = 1,
+                                        Id = 1,
                                         Value = (int)(rdcCallParams.Amount * 100) // Amount in cents
                                     }
                                 ]

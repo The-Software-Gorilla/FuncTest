@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using Tsg.Rdc.Model.SymX;
+using Tsg.Models.SymX;
 
 namespace Tsg.Rdc.Triggers;
 
@@ -71,7 +71,7 @@ public class SymXMockEndpoint
             HttpStatusCode = (int)HttpStatusCode.Accepted,
             Timestamp = timestamp,
             Message = "Accepted by Symitar. Total amount: " + envelope.Body?.ExecutePowerOnReturnArray.Request.Body
-                .UserDefinedParameters.RGUserNum[0].Value,
+                .UserDefinedParameters.RgUserNum[0].Value,
             SymxCallId = symxCallId,
             CorrelationId = correlationId
         });

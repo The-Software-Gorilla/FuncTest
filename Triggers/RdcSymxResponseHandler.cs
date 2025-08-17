@@ -5,7 +5,7 @@ using Azure.Storage.Queues;
 using Azure.Storage.Queues.Models;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using Tsg.Rdc.Model.SymX;
+using Tsg.Models.SymX;
 
 namespace Tsg.Rdc.Triggers;
 
