@@ -88,7 +88,7 @@ public class RdcForwarder
         
         var json = JsonSerializer.Serialize(rg, new JsonSerializerOptions { WriteIndented = true });
         
-        // --- Send to Queue: deposit-inbound ---
+        // --- Send to Queue: deposit-forward ---
         var queueClient = new QueueClient(_storageConn, "deposit-forward", new QueueClientOptions
         {
             MessageEncoding = QueueMessageEncoding.Base64

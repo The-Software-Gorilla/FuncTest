@@ -1,4 +1,6 @@
+using System.Net;
 using System.Text;
+using System.Text.Json;
 using System.Xml.Serialization;
 using Azure.Data.Tables;
 using Microsoft.AspNetCore.Http;
@@ -62,17 +64,19 @@ public class SymXMockEndpoint
         {
             _logger.LogWarning("x-SymX-Call-ID header is missing; skipping request storage.");
         }
-        
-        // Return a mock response that mimics the real SymX service.
-        return new AcceptedResult(string.Empty, new
+
+        string response = JsonSerializer.Serialize(new SymXCallResponse()
         {
-            status = "accepted",
-            timestamp = timestamp,
-            symxCallId = symxCallId,
-            correlationId = correlationId,
-            totalAmount = envelope.Body?.ExecutePowerOnReturnArray.Request.Body.UserDefinedParameters.RGUserNum[0].Value,
-            message = "SOAP payload applied to Symitar",
+            Status = "processed",
+            HttpStatusCode = (int)HttpStatusCode.Accepted,
+            Timestamp = timestamp,
+            Message = "Accepted by Symitar. Total amount: " + envelope.Body?.ExecutePowerOnReturnArray.Request.Body
+                .UserDefinedParameters.RGUserNum[0].Value,
+            SymxCallId = symxCallId,
+            CorrelationId = correlationId
         });
+        // Return a mock response that mimics the real SymX service.
+        return new AcceptedResult(string.Empty, response);
 
     }
     

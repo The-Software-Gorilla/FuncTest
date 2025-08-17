@@ -37,12 +37,25 @@ The application contains the following Azure Function triggers:
 - **`DepositTransaction` (HTTP Trigger)**: Accepts the Ensenta deposit transaction request in XML format. It generates a GUID for
 the transactionID and stores the XML message it to an Azure Storage Table. It then places a message on an Azure Storage Queue
   (`deposit-inbound`) to trigger the next step in the process.
-- **`RDCForwarder` (Queue Trigger)**: Listens to the `deposit-inbound` queue. When a message is received, it retrieves the corresponding
+- **`RdcForwarder` (Queue Trigger)**: Listens to the `deposit-inbound` queue. When a message is received, it retrieves the corresponding
 Ensenta XML from the Azure Table, deserializes it into the Ensenta model, and creates an RDCForwarder object that contains the call
 parameters for the SymXChange call. It then places a Json representation of the RDCForwarder object onto another Azure Storage Queue
   (`deposit-forward`).
-- **`RDCSymXCallBuilder`** (Queue Trigger)**: Listens to the `deposit-forward` queue. When a message is received, it deserializes the Json
-into an RDCForwarder object, transforms it into the SymXChange model (`SymXSoapEnvelope`) and creates a `SymXCall` object that 
+- **`RdcSymXCallBuilder` (Queue Trigger)**: Listens to the `deposit-forward` queue. When a message is received, it deserializes the Json
+into an `RdcCallParams` object, transforms it into the SymXChange model (`SymXSoapEnvelope`) and creates a `SymXCall` object that 
 contains the `SymXSoapEnvelope`. It then places a Json representation of the `SymXCall` object onto another Azure Storage Queue
   (`symx-outbound`). In the `SymXCall` object, it also includes a URL for the specific SymXChange instance to be called, the name of the 
 PowerOn script to be executed, a unique call ID, and the transaction ID from the original Ensenta message as a correlation ID.
+- **[`Tsg.SymxCaller` (Queue Processor)](https://github.com/The-Software-Gorilla/Tsg.SymxCaller)**: This is a separate project that 
+listens on the `symx-outbound` queue. When a message is received, it deserializes the Json into a `SymXCall` object, makes the actual
+SOAP call to the SymXChange endpoint, stores the response and writes it to the callback queue specified in the call object. This project 
+is specifically separated out as the SymX caller has to originate from a trusted network location that needs to be whitelisted with
+Jack Henry. It also needs a Jconnect VPN connection to be able to reach the SymXChange endpoint. This is the Application Server VM in
+the architecture diagram. The SymxCaller is built into a Docker container for easy deployment.
+- **`SymXMockEndpoint` (HTTP Trigger)**: A mock SymXChange endpoint for testing purposes. This function simulates the behavior
+of a real SymXChange service by accepting SOAP requests and returning predefined responses. This allows for testing the entire
+workflow without needing access to a live SymXChange instance. It also stores the incoming requests and timestamps them in an
+Azure Table so we can calculate the round-trip time for the entire process.
+- **`RdcSymxResponseHandler` (Queue Trigger)**: Listens to the callback queue specified in the `SymXCall` object. When a message is received,
+it processes the SymXChange response, updates the status of the original transaction in the Azure Table, and performs adds the call to 
+back to the deposit-inbound queue if it failed for retryable reasons.
